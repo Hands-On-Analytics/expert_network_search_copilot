@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Candidate Vector APIs
 FastAPI project implementing two APIs:
 - API 1: vector database construction (`POST /ingest`)
@@ -159,3 +160,6 @@ uv run --project .\expert_network_search_copilot candidate-ingest-search ingest 
 ```powershell path=null start=null
 uv run --project .\expert_network_search_copilot candidate-ingest-search ingest --full-refresh --limit 25
 ```
+=======
+# expert_network_search_copilot
+>>>>>>> origin/master
