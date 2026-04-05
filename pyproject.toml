@@ -1,0 +1,27 @@
+[project]
+name = "candidate-vector-api"
+version = "0.1.0"
+description = "FastAPI service to ingest candidate profiles from PostgreSQL into ChromaDB vectors"
+readme = "README.md"
+authors = [
+    { name = "Hands-On-Analytics", email = "handsonanalytics7@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "chromadb>=1.5.5",
+    "fastapi>=0.135.3",
+    "openai>=2.30.0",
+    "psycopg[binary]>=3.3.3",
+    "pydantic-settings>=2.13.1",
+    "python-dotenv>=1.2.2",
+    "sqlalchemy>=2.0.49",
+    "typer>=0.24.1",
+    "uvicorn[standard]>=0.43.0",
+]
+
+[project.scripts]
+candidate-vector-api = "candidate_vector_api.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.28,<0.10.0"]
+build-backend = "uv_build"
