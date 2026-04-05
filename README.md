@@ -21,8 +21,8 @@ FastAPI project implementing two APIs:
 
 ## Project Structure
 ```text path=null start=null
-candidate_vector_api/
-  src/candidate_vector_api/
+expert_network_search_copilot/
+  src/candidate_ingest_search/
     api.py            # FastAPI routes
     schemas.py        # Pydantic request/response models
     ingestion.py      # API 1 pipeline
@@ -39,15 +39,15 @@ candidate_vector_api/
 ## Setup
 1. Install dependencies:
 ```powershell path=null start=null
-uv sync --project .\candidate_vector_api
+uv sync --project .\expert_network_search_copilot
 ```
 
 2. Create environment file:
 ```powershell path=null start=null
-Copy-Item .\candidate_vector_api\.env.example .\candidate_vector_api\.env
+Copy-Item .\expert_network_search_copilot\.env.example .\expert_network_search_copilot\.env
 ```
 
-3. Update `candidate_vector_api/.env` with valid values:
+3. Update `expert_network_search_copilot/.env` with valid values:
 - `POSTGRES_HOST`
 - `POSTGRES_PORT`
 - `POSTGRES_DB`
@@ -59,7 +59,7 @@ Copy-Item .\candidate_vector_api\.env.example .\candidate_vector_api\.env
 ## Run the Server
 From repository root:
 ```powershell path=null start=null
-uv run --project .\candidate_vector_api candidate-vector-api serve --host 0.0.0.0 --port 8000 --reload
+uv run --project .\expert_network_search_copilot candidate-ingest-search serve --host 0.0.0.0 --port 8000 --reload
 ```
 
 API docs:
@@ -102,7 +102,7 @@ curl -X POST http://localhost:8000/search \
 ```
 
 ## Pydantic Request/Response Schemas
-All endpoint payloads are defined with Pydantic models in `src/candidate_vector_api/schemas.py`.
+All endpoint payloads are defined with Pydantic models in `src/candidate_ingest_search/schemas.py`.
 
 - `GET /health`
   - Response: `HealthResponse`
@@ -152,10 +152,10 @@ All endpoint payloads are defined with Pydantic models in `src/candidate_vector_
 ## Useful Commands
 ### Ingest full dataset from CLI
 ```powershell path=null start=null
-uv run --project .\candidate_vector_api candidate-vector-api ingest --full-refresh
+uv run --project .\expert_network_search_copilot candidate-ingest-search ingest --full-refresh
 ```
 
 ### Run a limited ingestion smoke test
 ```powershell path=null start=null
-uv run --project .\candidate_vector_api candidate-vector-api ingest --full-refresh --limit 25
+uv run --project .\expert_network_search_copilot candidate-ingest-search ingest --full-refresh --limit 25
 ```

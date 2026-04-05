@@ -5,8 +5,8 @@ from functools import lru_cache
 
 from fastapi import FastAPI, HTTPException
 
-from candidate_vector_api.ingestion import CandidateIngestionPipeline
-from candidate_vector_api.schemas import (
+from candidate_ingest_search.ingestion import CandidateIngestionPipeline
+from candidate_ingest_search.schemas import (
     ExpertResult,
     HealthResponse,
     IngestRequest,
@@ -14,8 +14,8 @@ from candidate_vector_api.schemas import (
     SearchRequest,
     SearchResponse,
 )
-from candidate_vector_api.search import CandidateSearchService
-from candidate_vector_api.settings import get_settings
+from candidate_ingest_search.search import CandidateSearchService
+from candidate_ingest_search.settings import get_settings
 
 
 @lru_cache

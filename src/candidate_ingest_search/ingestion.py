@@ -4,12 +4,12 @@ from collections.abc import Iterator
 from dataclasses import dataclass
 from time import perf_counter
 
-from candidate_vector_api.chunking import CandidateChunkBuilder
-from candidate_vector_api.embeddings import OpenRouterEmbeddingClient
-from candidate_vector_api.repository import CandidateRepository
-from candidate_vector_api.settings import Settings
-from candidate_vector_api.types import ProfileChunk
-from candidate_vector_api.vector_store import ChromaVectorStore
+from candidate_ingest_search.chunking import CandidateChunkBuilder
+from candidate_ingest_search.embeddings import OpenRouterEmbeddingClient
+from candidate_ingest_search.repository import CandidateRepository
+from candidate_ingest_search.settings import Settings
+from candidate_ingest_search.types import ProfileChunk
+from candidate_ingest_search.vector_store import ChromaVectorStore
 
 
 def _batched(items: list[ProfileChunk], batch_size: int) -> Iterator[list[ProfileChunk]]:

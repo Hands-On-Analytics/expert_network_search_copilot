@@ -5,9 +5,9 @@ from dataclasses import dataclass, field
 from threading import Lock
 from uuid import uuid4
 
-from candidate_vector_api.embeddings import OpenRouterEmbeddingClient
-from candidate_vector_api.settings import Settings
-from candidate_vector_api.vector_store import ChromaVectorStore
+from candidate_ingest_search.embeddings import OpenRouterEmbeddingClient
+from candidate_ingest_search.settings import Settings
+from candidate_ingest_search.vector_store import ChromaVectorStore
 
 _STOP_WORDS = {
     "a",

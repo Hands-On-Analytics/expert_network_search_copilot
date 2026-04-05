@@ -5,8 +5,8 @@ import json
 import typer
 import uvicorn
 
-from candidate_vector_api.ingestion import CandidateIngestionPipeline
-from candidate_vector_api.settings import get_settings
+from candidate_ingest_search.ingestion import CandidateIngestionPipeline
+from candidate_ingest_search.settings import get_settings
 
 cli = typer.Typer(help="Candidate vector ingestion commands.")
 
@@ -36,7 +36,7 @@ def serve_command(
     port: int = typer.Option(8000, help="Port for uvicorn."),
     reload: bool = typer.Option(False, help="Enable autoreload."),
 ) -> None:
-    uvicorn.run("candidate_vector_api.api:app", host=host, port=port, reload=reload)
+    uvicorn.run("candidate_ingest_search.api:app", host=host, port=port, reload=reload)
 
 
 def main() -> None:

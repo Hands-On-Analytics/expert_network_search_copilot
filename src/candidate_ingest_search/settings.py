@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     openrouter_base_url: str = Field("https://openrouter.ai/api/v1", alias="OPENROUTER_BASE_URL")
     embedding_model: str = Field("openai/text-embedding-3-small", alias="EMBEDDING_MODEL")
     openrouter_site_url: str | None = Field(default=None, alias="OPENROUTER_SITE_URL")
-    openrouter_app_name: str | None = Field(default="candidate-vector-api", alias="OPENROUTER_APP_NAME")
+    openrouter_app_name: str | None = Field(default="candidate-ingest-search", alias="OPENROUTER_APP_NAME")
 
     chroma_path: Path = Field(default=Path(".chroma"), alias="CHROMA_PATH")
     chroma_collection_name: str = Field("candidate_profiles", alias="CHROMA_COLLECTION_NAME")

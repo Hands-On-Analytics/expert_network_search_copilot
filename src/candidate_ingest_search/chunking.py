@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Iterable
 
-from candidate_vector_api.types import CandidateProfile, ProfileChunk
+from candidate_ingest_search.types import CandidateProfile, ProfileChunk
 
 
 def _coalesce(value: str | None) -> str | None:

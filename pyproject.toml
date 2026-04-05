@@ -1,5 +1,5 @@
 [project]
-name = "candidate-vector-api"
+name = "candidate-ingest-search"
 version = "0.1.0"
 description = "FastAPI service to ingest candidate profiles from PostgreSQL into ChromaDB vectors"
 readme = "README.md"
@@ -20,7 +20,7 @@ dependencies = [
 ]
 
 [project.scripts]
-candidate-vector-api = "candidate_vector_api.cli:main"
+candidate-ingest-search = "candidate_ingest_search.cli:main"
 
 [build-system]
 requires = ["uv_build>=0.9.28,<0.10.0"]

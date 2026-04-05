@@ -4,8 +4,7 @@ from uuid import UUID
 
 import psycopg
 from psycopg.rows import dict_row
-
-from candidate_vector_api.types import (
+from candidate_ingest_search.types import (
     CandidateProfile,
     EducationRecord,
     LanguageRecord,

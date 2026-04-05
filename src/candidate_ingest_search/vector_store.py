@@ -6,7 +6,7 @@ from typing import Any
 
 import chromadb
 
-from candidate_vector_api.types import ProfileChunk
+from candidate_ingest_search.types import ProfileChunk
 
 
 class ChromaVectorStore:
