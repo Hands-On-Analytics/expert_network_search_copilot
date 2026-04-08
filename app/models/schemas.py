@@ -67,6 +67,37 @@ class CandidateWorkRow(BaseModel):
     workexperience_description: str | None = None
 
 
+class ExtractedFilters(BaseModel):
+    """Structured filters extracted from a natural-language query."""
+    country_name: str | None = Field(default=None, description="Full country name (e.g. 'United States', 'United Kingdom', 'India')")
+    country_code: str | None = Field(default=None, description="ISO 3166-1 alpha-2 country code (e.g. 'US', 'GB', 'IN')")
+    city_name: str | None = Field(default=None, description="City to filter candidates by")
+    gender: str | None = Field(default=None, description="Gender filter (e.g. Male, Female)")
+    min_years_of_experience: int | None = Field(default=None, ge=0, description="Minimum years of experience")
+    max_years_of_experience: int | None = Field(default=None, ge=0, description="Maximum years of experience")
+    keywords: str | None = Field(default=None, description="Remaining semantic search query after extracting filters")
+
+
+class GradeResult(BaseModel):
+    """Binary relevance grade for a retrieved document."""
+    relevant: bool = Field(description="Whether the document is relevant to the query")
+
+
+class QueryRequest(BaseModel):
+    query: str = Field(..., min_length=1, description="Natural-language question")
+    top_k: int | None = Field(default=None, ge=1, le=20, description="Override number of retrieved chunks")
+
+
+class SourceChunk(BaseModel):
+    content: str
+    metadata: dict[str, Any] = {}
+
+
+class QueryResponse(BaseModel):
+    answer: str
+    sources: list[SourceChunk] = []
+
+
 class AssembledCandidateRecord(BaseModel):
     candidate_id: UUID
     profile: CandidateProfileRow

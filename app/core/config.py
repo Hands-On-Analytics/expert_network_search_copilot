@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     OPENROUTER_API_KEY: str
     OPENROUTER_BASE_URL: str = "https://openrouter.ai/api/v1"
     OPENROUTER_EMBEDDING_MODEL: str = "openai/text-embedding-3-small"
+    OPENROUTER_CHAT_MODEL: str = "openai/gpt-4o-mini"
+
+    RAG_TOP_K: int = 5
 
     INGEST_BATCH_SIZE: int = 200
     # EMBED_BATCH_SIZE: int = 64

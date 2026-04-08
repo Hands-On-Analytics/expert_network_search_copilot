@@ -30,3 +30,16 @@ class QdrantService:
             collection_name=settings.QDRANT_COLLECTION,
             embedding=self.embeddings,
         )
+
+    def list_collections(self) -> list[dict]:
+        """Return info about all collections in Qdrant."""
+        response = self.client.get_collections()
+        collections = []
+        for c in response.collections:
+            info = self.client.get_collection(c.name)
+            collections.append({
+                "name": c.name,
+                "points_count": info.points_count,
+                "status": info.status.value if info.status else None,
+            })
+        return collections

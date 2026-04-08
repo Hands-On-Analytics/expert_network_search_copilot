@@ -59,11 +59,19 @@ Created at: {profile.created_at or ""}
 
         common_metadata = {
             "candidate_id": str(candidate.candidate_id),
+            "first_name": profile.first_name,
+            "last_name": profile.last_name,
             "full_name": full_name,
+            "gender": profile.gender,
+            "date_of_birth": str(profile.date_of_birth) if profile.date_of_birth else None,
+            "email": profile.email,
+            "candidate_headline": profile.candidate_headline,
+            "phone": profile.phone,
+            "years_of_experience": profile.years_of_experience,
+            "city_name": profile.city_name,
             "country_name": profile.country_name,
             "country_code": profile.country_code,
-            "city_name": profile.city_name,
-            "years_of_experience": profile.years_of_experience,
+            "created_at": str(profile.created_at) if profile.created_at else None,
             "content_hash": content_hash,
             "full_candidate_record": base_payload,
         }
