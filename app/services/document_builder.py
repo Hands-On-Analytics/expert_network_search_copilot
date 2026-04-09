@@ -7,14 +7,15 @@ from app.utils.hashing import stable_hash
 _NAMESPACE = NAMESPACE_DNS
 
 
-def _point_id(candidate_id: UUID, doc_type: str) -> str:
+def _point_id(candidate_id: UUID) -> str:
     """Generate a deterministic UUID suitable as a Qdrant point ID."""
-    return str(uuid5(_NAMESPACE, f"candidate:{candidate_id}:{doc_type}"))
+    return str(uuid5(_NAMESPACE, f"candidate:{candidate_id}"))
 
 
 class CandidateDocumentBuilder:
     @staticmethod
     def build_documents(candidate: AssembledCandidateRecord) -> list[Document]:
+        """Build a single Document per candidate with a rich page_content."""
         profile = candidate.profile
         base_payload = candidate.model_dump(mode="json")
         content_hash = stable_hash(base_payload)
@@ -23,116 +24,84 @@ class CandidateDocumentBuilder:
             part for part in [profile.first_name, profile.last_name] if part
         ).strip()
 
-        profile_text = f"""
-Candidate ID: {candidate.candidate_id}
-Full name: {full_name}
-Headline: {profile.candidate_headline or ""}
-Gender: {profile.gender or ""}
-Years of experience: {profile.years_of_experience or ""}
-City: {profile.city_name or ""}
-Country: {profile.country_name or ""}
-Country code: {profile.country_code or ""}
-Email: {profile.email or ""}
-Phone: {profile.phone or ""}
-Created at: {profile.created_at or ""}
-""".strip()
+        # ── headline + location + experience ──────────────────────────
+        sections: list[str] = []
 
-        languages_text = "\n".join(
-            f"Language: {item.language or ''}, Proficiency: {item.language_proficiency_level or ''}"
-            for item in candidate.languages
-        ).strip()
+        headline = profile.candidate_headline or full_name
+        location_parts = [p for p in [profile.city_name, profile.country_name] if p]
+        location = ", ".join(location_parts) if location_parts else "Unknown location"
+        yoe = profile.years_of_experience
 
-        education_text = "\n".join(
-            f"Institution: {item.institution_name or ''}, Degree: {item.degree or ''}, Field: {item.field_of_study or ''}, Start year: {item.start_year or ''}, Graduation year: {item.graduation_year or ''}"
-            for item in candidate.education
-        ).strip()
+        sections.append(
+            f"{full_name} \u2014 {headline}.\n"
+            f"Located in {location}."
+            + (f" {yoe} years of professional experience." if yoe else "")
+        )
 
-        skills_text = "\n".join(
-            f"Skill: {item.skill_name or ''}, Category: {item.skill_category or ''}, Years: {item.skill_years_of_experience or ''}, Proficiency: {item.skill_proficiency_level or ''}"
-            for item in candidate.skills
-        ).strip()
+        # ── work experience ───────────────────────────────────────────
+        if candidate.work_experiences:
+            work_lines: list[str] = []
+            for w in candidate.work_experiences:
+                current = "Current" if w.is_current_flag else "Past"
+                title = w.job_title or "Unknown role"
+                industry = f" in {w.industry}" if w.industry else ""
+                period = f" (since {w.start_date})" if w.start_date else ""
+                desc = f"\n{w.workexperience_description}" if w.workexperience_description else ""
+                work_lines.append(f"{current} Role: {title}{industry}{period}.{desc}")
+            sections.append("\n".join(work_lines))
 
-        work_text = "\n".join(
-            f"Industry: {item.industry or ''}, Country: {item.country_name or ''}, Job title: {item.job_title or ''}, Start date: {item.start_date or ''}, End date: {item.end_date or ''}, Current flag: {item.is_current_flag or 0}, Description: {item.workexperience_description or ''}"
-            for item in candidate.work_experiences
-        ).strip()
+        # ── skills ────────────────────────────────────────────────────
+        if candidate.skills:
+            skill_parts = []
+            for s in candidate.skills:
+                name = s.skill_name or "Unknown"
+                cat = f"{s.skill_category}, " if s.skill_category else ""
+                yrs = f"{s.skill_years_of_experience} yrs, " if s.skill_years_of_experience else ""
+                prof = s.skill_proficiency_level or ""
+                skill_parts.append(f"{name} ({cat}{yrs}{prof})")
+            sections.append("Skills: " + ", ".join(skill_parts) + ".")
 
-        common_metadata = {
+        # ── education ─────────────────────────────────────────────────
+        if candidate.education:
+            edu_parts = []
+            for e in candidate.education:
+                degree = e.degree or ""
+                field = f" in {e.field_of_study}" if e.field_of_study else ""
+                inst = f" from {e.institution_name}" if e.institution_name else ""
+                years = ""
+                if e.start_year and e.graduation_year:
+                    years = f" ({e.start_year}\u2013{e.graduation_year})"
+                elif e.graduation_year:
+                    years = f" ({e.graduation_year})"
+                edu_parts.append(f"{degree}{field}{inst}{years}")
+            sections.append("Education: " + "; ".join(edu_parts) + ".")
+
+        # ── languages ─────────────────────────────────────────────────
+        if candidate.languages:
+            lang_parts = [
+                f"{l.language} ({l.language_proficiency_level})"
+                if l.language_proficiency_level
+                else (l.language or "")
+                for l in candidate.languages
+            ]
+            sections.append("Languages: " + ", ".join(lang_parts) + ".")
+
+        page_content = "\n\n".join(sections)
+
+        # ── lean metadata (filter + identification fields only) ───────
+        metadata = {
             "candidate_id": str(candidate.candidate_id),
-            "first_name": profile.first_name,
-            "last_name": profile.last_name,
             "full_name": full_name,
-            "gender": profile.gender,
-            "date_of_birth": str(profile.date_of_birth) if profile.date_of_birth else None,
-            "email": profile.email,
             "candidate_headline": profile.candidate_headline,
-            "phone": profile.phone,
             "years_of_experience": profile.years_of_experience,
-            "city_name": profile.city_name,
             "country_name": profile.country_name,
             "country_code": profile.country_code,
-            "created_at": str(profile.created_at) if profile.created_at else None,
+            "city_name": profile.city_name,
+            "gender": profile.gender,
             "content_hash": content_hash,
-            "full_candidate_record": base_payload,
+            "point_id": _point_id(candidate.candidate_id),
         }
 
-        docs = [
-            Document(
-                page_content=profile_text,
-                metadata={
-                    **common_metadata,
-                    "doc_type": "profile",
-                    "point_id": _point_id(candidate.candidate_id, "profile"),
-                },
-            )
+        return [
+            Document(page_content=page_content, metadata=metadata)
         ]
-
-        if languages_text:
-            docs.append(
-                Document(
-                    page_content=languages_text,
-                    metadata={
-                        **common_metadata,
-                        "doc_type": "languages",
-                        "point_id": _point_id(candidate.candidate_id, "languages"),
-                    },
-                )
-            )
-
-        if education_text:
-            docs.append(
-                Document(
-                    page_content=education_text,
-                    metadata={
-                        **common_metadata,
-                        "doc_type": "education",
-                        "point_id": _point_id(candidate.candidate_id, "education"),
-                    },
-                )
-            )
-
-        if skills_text:
-            docs.append(
-                Document(
-                    page_content=skills_text,
-                    metadata={
-                        **common_metadata,
-                        "doc_type": "skills",
-                        "point_id": _point_id(candidate.candidate_id, "skills"),
-                    },
-                )
-            )
-
-        if work_text:
-            docs.append(
-                Document(
-                    page_content=work_text,
-                    metadata={
-                        **common_metadata,
-                        "doc_type": "work_experience",
-                        "point_id": _point_id(candidate.candidate_id, "work_experience"),
-                    },
-                )
-            )
-
-        return docs
